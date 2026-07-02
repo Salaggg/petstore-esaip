@@ -17,7 +17,6 @@ public class Address {
     private String zipCode;
     private String city;
 
-    // --- Constructeurs ---
     public Address() {
     }
 
@@ -28,7 +27,6 @@ public class Address {
         this.city = city;
     }
 
-    // --- Getters et Setters (Obligatoires pour Hibernate) ---
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

@@ -11,16 +11,16 @@ public class PetStore {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false)
     private String managerName;
 
-    // --- RELATIONS ---
-
-    // Relation 1 à 1 avec Address
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL, optional = false)
+    @JoinColumn(name = "address_id", nullable = false, unique = true)
     private Address address;
 
-    // Relation Plusieurs à Plusieurs avec Product
     @ManyToMany
     @JoinTable(
             name = "petstore_product",
@@ -29,11 +29,9 @@ public class PetStore {
     )
     private List<Product> products = new ArrayList<>();
 
-    // Relation 1 à Plusieurs avec Animal
-    @OneToMany(mappedBy = "petStore")
+    @OneToMany(mappedBy = "petStore", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Animal> animals = new ArrayList<>();
 
-    // --- Constructeurs ---
     public PetStore() {
     }
 
@@ -42,7 +40,6 @@ public class PetStore {
         this.managerName = managerName;
     }
 
-    // --- Getters et Setters ---
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -56,8 +53,54 @@ public class PetStore {
     public void setAddress(Address address) { this.address = address; }
 
     public List<Product> getProducts() { return products; }
-    public void setProducts(List<Product> products) { this.products = products; }
+    public void setProducts(List<Product> products) {
+        List<Product> currentProducts = new ArrayList<>(this.products);
+        currentProducts.forEach(this::removeProduct);
+
+        if (products != null) {
+            products.forEach(this::addProduct);
+        }
+    }
 
     public List<Animal> getAnimals() { return animals; }
-    public void setAnimals(List<Animal> animals) { this.animals = animals; }
+    public void setAnimals(List<Animal> animals) {
+        List<Animal> currentAnimals = new ArrayList<>(this.animals);
+        currentAnimals.forEach(this::removeAnimal);
+
+        if (animals != null) {
+            animals.forEach(this::addAnimal);
+        }
+    }
+
+    public void addProduct(Product product) {
+        if (product == null || products.contains(product)) {
+            return;
+        }
+
+        products.add(product);
+
+        if (!product.getPetStores().contains(this)) {
+            product.getPetStores().add(this);
+        }
+    }
+
+    public void removeProduct(Product product) {
+        if (product == null || !products.remove(product)) {
+            return;
+        }
+
+        product.getPetStores().remove(this);
+    }
+
+    public void addAnimal(Animal animal) {
+        if (animal != null) {
+            animal.setPetStore(this);
+        }
+    }
+
+    public void removeAnimal(Animal animal) {
+        if (animal != null && animal.getPetStore() == this) {
+            animal.setPetStore(null);
+        }
+    }
 }

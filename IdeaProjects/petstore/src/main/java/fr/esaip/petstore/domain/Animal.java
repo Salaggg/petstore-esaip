@@ -16,10 +16,10 @@ public abstract class Animal {
 
     private String couleur;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "pet_store_id", nullable = false)
     private PetStore petStore;
 
-     //construteur
     public Animal() {
     }
 
@@ -28,7 +28,6 @@ public abstract class Animal {
         this.couleur = couleur;
     }
 
-    // Getters Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -39,5 +38,20 @@ public abstract class Animal {
     public void setCouleur(String couleur) { this.couleur = couleur; }
 
     public PetStore getPetStore() { return petStore; }
-    public void setPetStore(PetStore petStore) { this.petStore = petStore; }
+    public void setPetStore(PetStore petStore) {
+        if (this.petStore == petStore) {
+            return;
+        }
+
+        PetStore previousPetStore = this.petStore;
+        this.petStore = petStore;
+
+        if (previousPetStore != null) {
+            previousPetStore.getAnimals().remove(this);
+        }
+
+        if (petStore != null && !petStore.getAnimals().contains(this)) {
+            petStore.getAnimals().add(this);
+        }
+    }
 }
