@@ -1,7 +1,7 @@
 # TP Évaluation JPA / Hibernate - DevOps
 
-**Nom :** MOLINA
-**Prénom :** Salah
+**Noms :** MOLINA / RADOUANE
+**Prénoms :** Salah / Youssef
 
 ## Instructions d'exécution
 1. Avoir un serveur MySQL local actif.
